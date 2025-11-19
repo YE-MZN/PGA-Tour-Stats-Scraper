@@ -24,7 +24,7 @@ It supports:
 | `PGA Tour Event Stats Between Scraper.py` | Scrapes data for specific **date ranges** (YYYY-MM-DD) to (YYYY-MM-DD). Use this to keep data updated |
 | `Master Webscrape PGA Tour Stats.ipynb` | Interactive **Jupyter Notebook** for scraping and analysis |
 | `Full List of PGA Tour Stats and Correlating Codes.md` | Reference list of all stat categories and their corresponding codes |
-| `PGA Tour Event Stats/` | Folder containing compressed **complete scapred data** (as of present [2025-05-01]) |
+| `PGA Tour Event Stats/` | Folder containing compressed **complete scraped data** (2004-01-01 to 2025-04-20]) |
 
 ---
 
