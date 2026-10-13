@@ -147,6 +147,14 @@ python plot_annual_driving_distance.py
 
 The chart shows a drive-weighted annual average and the median plus interquartile range across player-event averages. The summary table is saved in `PGA Tour Stats Analysis/Summaries/`; figures are saved in `PGA Tour Stats Analysis/Charts/`. Incomplete latest seasons are marked as partial.
 
+For a broader view of how PGA Tour play has changed, generate annual trends for driving distance, driving accuracy, greens in regulation, birdies per round, three-putts per 100 holes, and scoring average:
+
+```bash
+python analyze_tour_evolution.py
+```
+
+This recalculates percentages from their underlying counts, deduplicates repeated player-event rows, and writes `tour_evolution_overview.png` and `tour_evolution_annual.csv` into the existing `Charts/` and `Summaries/` folders. SG metrics are not included in this overview because their event/player coverage is lower and varies from the other measures.
+
 ---
 
 ## 📚 Stat Codes Reference
