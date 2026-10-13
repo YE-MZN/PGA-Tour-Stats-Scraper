@@ -139,6 +139,14 @@ python explore_pga_tour_stats.py --year 2024
 
 The chart compares Strokes Gained: Tee-to-Green with Strokes Gained: Putting, and driving distance with driving accuracy. Point color indicates Strokes Gained: Total when available. Charts are saved in `PGA Tour Stats Analysis/Charts/`.
 
+Generate the annual driving-distance trend across all prepared seasons:
+
+```bash
+python plot_annual_driving_distance.py
+```
+
+The chart shows a drive-weighted annual average and the median plus interquartile range across player-event averages. The summary table is saved in `PGA Tour Stats Analysis/Summaries/`; figures are saved in `PGA Tour Stats Analysis/Charts/`. Incomplete latest seasons are marked as partial.
+
 ---
 
 ## 📚 Stat Codes Reference
