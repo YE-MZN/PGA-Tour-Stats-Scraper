@@ -14,12 +14,42 @@ METRIC_COLUMNS = {
 }
 SCORING_AVERAGE = "Scoring Average"
 METRIC_LABELS = {
-    "driving_distance_yards": ("Driving distance", "Yards", "#bd4d34"),
-    "driving_accuracy_pct": ("Driving accuracy", "% of possible fairways", "#176c68"),
-    "gir_pct": ("Greens in regulation", "% of holes", "#3478a8"),
-    "birdies_per_round": ("Birdies", "Per round", "#d08b25"),
-    "three_putts_per_100_holes": ("Three-putt frequency", "Per 100 holes", "#685b83"),
-    "scoring_average": ("Scoring average", "Strokes per round", "#343b40"),
+    "driving_distance_yards": (
+        "Driving distance",
+        "yd",
+        "#bd4d34",
+        "Total drive distance / measured drives. Higher = farther tee shots.",
+    ),
+    "driving_accuracy_pct": (
+        "Fairway accuracy",
+        "%",
+        "#176c68",
+        "Fairways hit / possible fairways. Higher = more accurate, not necessarily lower scores.",
+    ),
+    "gir_pct": (
+        "Greens in regulation",
+        "%",
+        "#3478a8",
+        "Greens hit in regulation / holes played. Higher = more greens reached on schedule.",
+    ),
+    "birdies_per_round": (
+        "Birdies per round",
+        "birdies / round",
+        "#d08b25",
+        "Total birdies / rounds played. Higher = more under-par holes per round.",
+    ),
+    "three_putts_per_100_holes": (
+        "Three-putt frequency",
+        "per 100 holes",
+        "#685b83",
+        "Three-putts / holes played x 100. Lower = fewer three-putts.",
+    ),
+    "scoring_average": (
+        "Scoring average",
+        "strokes / round",
+        "#343b40",
+        "Total strokes / rounds played. Lower = fewer strokes; course difficulty varies.",
+    ),
 }
 
 
@@ -90,24 +120,71 @@ def plot_trends(summary: pd.DataFrame, charts_dir: Path) -> None:
     years = summary["season"]
     latest_year = int(years.iloc[-1])
     latest_date = summary["data_through"].iloc[-1]
+    full_seasons = summary[summary["season"].lt(latest_year)]
+    first_full = full_seasons.iloc[0]
+    last_full = full_seasons.iloc[-1]
 
-    figure, axes = plt.subplots(3, 2, figsize=(14, 11), layout="constrained")
+    figure = plt.figure(figsize=(15, 14), layout="constrained")
     figure.patch.set_facecolor("#f7f6f2")
-    for axis, (column, (title, unit, color)) in zip(axes.flat, METRIC_LABELS.items()):
+    panels = figure.add_gridspec(3, 2)
+    for index, (column, (title, unit, color, definition)) in enumerate(METRIC_LABELS.items()):
+        panel = panels[index // 2, index % 2].subgridspec(
+            2, 1, height_ratios=[1.15, 2.8], hspace=0.02
+        )
+        heading = figure.add_subplot(panel[0])
+        heading.axis("off")
+        heading.text(
+            0,
+            0.96,
+            title,
+            ha="left",
+            va="top",
+            fontsize=12,
+            fontweight="bold",
+            color="#111111",
+        )
+        heading.text(0, 0.66, definition, ha="left", va="top", fontsize=8.5, color="#333333")
+        digits = 1 if column in {"driving_distance_yards", "driving_accuracy_pct", "gir_pct"} else 2
+        change = last_full[column] - first_full[column]
+        heading.text(
+            0,
+            0.36,
+            f"{int(first_full['season'])}-{int(last_full['season'])}: "
+            f"{first_full[column]:.{digits}f} to {last_full[column]:.{digits}f} {unit} "
+            f"({change:+.{digits}f})",
+            ha="left",
+            va="top",
+            fontsize=8.5,
+            fontweight="bold",
+            color=color,
+        )
+        heading.text(
+            0,
+            0.08,
+            f"{latest_year} partial: {summary.iloc[-1][column]:.{digits}f} {unit} "
+            f"through {pd.to_datetime(latest_date).strftime('%b %d, %Y')} "
+            f"({int(summary.iloc[-1]['tournament_count'])} events)",
+            ha="left",
+            va="top",
+            fontsize=8,
+            color="#333333",
+        )
+
+        axis = figure.add_subplot(panel[1])
         values = summary[column]
         axis.set_facecolor("#f7f6f2")
         axis.plot(
-            years.iloc[:-1],
-            values.iloc[:-1],
+            full_seasons["season"],
+            full_seasons[column],
             color=color,
             linewidth=2.2,
             marker="o",
             markersize=3.8,
         )
-        if len(summary) > 1:
+        if not full_seasons.empty:
             axis.plot(
-                years.iloc[-2:],
-                values.iloc[-2:],
+                [last_full["season"], latest_year],
+                [last_full[column], values.iloc[-1]],
                 color=color,
                 linewidth=1.8,
                 linestyle="--",
@@ -123,30 +200,33 @@ def plot_trends(summary: pd.DataFrame, charts_dir: Path) -> None:
                 linewidths=1.8,
                 zorder=4,
             )
-        axis.set_title(title, loc="left", fontweight="bold", color="#111111", fontsize=12)
         axis.set_ylabel(unit, color="#111111", fontsize=9)
-        axis.set_xticks(years.iloc[::2])
+        tick_years = list(full_seasons["season"].iloc[::2])
+        axis.set_xticks(tick_years)
         axis.set_xlim(years.min() - 0.5, years.max() + 0.5)
         axis.spines[["top", "right"]].set_visible(False)
         axis.spines[["left", "bottom"]].set_color("#a9aaa6")
         axis.tick_params(colors="#111111", labelsize=8)
         for label in axis.get_xticklabels() + axis.get_yticklabels():
             label.set_fontweight("bold")
+        axis.set_xlabel("Season", fontweight="bold", color="#111111")
 
     figure.suptitle(
         "PGA TOUR | How the game has changed",
         x=0.04,
         ha="left",
-        fontsize=19,
+        fontsize=18,
         fontweight="bold",
         color="#111111",
     )
     figure.text(
         0.04,
-        0.965,
-        f"2004-2024 full seasons   |   {latest_year} is partial through {latest_date} (dashed)",
+        0.97,
+        f"Full seasons: {int(first_full['season'])}-{int(last_full['season'])}  |  "
+        f"{latest_year} is partial through {pd.to_datetime(latest_date).strftime('%B %d, %Y')} "
+        "(dashed segment)",
         color="#333333",
-        fontsize=10,
+        fontsize=9,
     )
     output_path = charts_dir / "tour_evolution_overview.png"
     figure.savefig(output_path, dpi=300, facecolor=figure.get_facecolor())
@@ -177,7 +257,7 @@ def main() -> None:
     first = summary.iloc[0]
     full_seasons = summary[summary["season"].lt(summary["season"].max())]
     last = full_seasons.iloc[-1]
-    for column, (title, unit, _) in METRIC_LABELS.items():
+    for column, (title, unit, _, _) in METRIC_LABELS.items():
         print(
             f"{title}: {first[column]:.3f} -> {last[column]:.3f} {unit} "
             f"({last['season'] - first['season']} seasons)"
