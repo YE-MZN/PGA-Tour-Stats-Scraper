@@ -137,7 +137,7 @@ Generate an exploratory chart from a prepared dataset (requires `pandas` and `ma
 python explore_pga_tour_stats.py --year 2024
 ```
 
-The chart compares Strokes Gained: Tee-to-Green with Strokes Gained: Putting, and driving distance with driving accuracy. Point color indicates Strokes Gained: Total when available. It is saved as `exploratory_analysis_YEAR.png` in the analysis data directory.
+The chart compares Strokes Gained: Tee-to-Green with Strokes Gained: Putting, and driving distance with driving accuracy. Point color indicates Strokes Gained: Total when available. Charts are saved in `PGA Tour Stats Analysis/Charts/`.
 
 ---
 

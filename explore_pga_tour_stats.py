@@ -176,10 +176,12 @@ def main() -> None:
     data_path = data_dir / f"pga_tour_stats_{args.year}.csv.gz"
     if not data_path.is_file():
         parser.error(f"Dataset not found: {data_path}")
+    charts_dir = data_dir / "Charts"
+    charts_dir.mkdir(parents=True, exist_ok=True)
     create_chart(
         load_analysis_data(data_path),
         args.year,
-        data_dir / f"exploratory_analysis_{args.year}.png",
+        charts_dir / f"exploratory_analysis_{args.year}.png",
     )
 
 
