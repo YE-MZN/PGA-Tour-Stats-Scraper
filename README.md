@@ -129,6 +129,16 @@ stats = pd.read_csv("PGA Tour Stats Analysis/pga_tour_stats_2024.csv.gz")
 
 The script uses only the Python standard library and reads the ZIP archives without extracting or modifying them.
 
+### Explore a Year
+
+Generate an exploratory chart from a prepared dataset (requires `pandas` and `matplotlib`):
+
+```bash
+python explore_pga_tour_stats.py --year 2024
+```
+
+The chart compares Strokes Gained: Tee-to-Green with Strokes Gained: Putting, and driving distance with driving accuracy. Point color indicates Strokes Gained: Total when available. It is saved as `exploratory_analysis_YEAR.png` in the analysis data directory.
+
 ---
 
 ## 📚 Stat Codes Reference
