@@ -105,6 +105,32 @@ Open `Master Webscrape PGA Tour Stats.ipynb` to run and explore scrapes using co
 Ideal for exploratory work or first-time users.
 ---
 
+### Prepare Data for Analysis
+
+The archived yearly ZIP files contain many separate CSV files. Combine them into one compressed dataset per year:
+
+```bash
+python prepare_analysis_data.py
+```
+
+To process selected years only:
+
+```bash
+python prepare_analysis_data.py --years 2023 2024 2025
+```
+
+The default output directory is `PGA Tour Stats Analysis/`. Each `pga_tour_stats_YEAR.csv.gz` contains one row per player, event, and statistic. It includes the season, event date, tournament, category, subcategory, statistic name, rank, player, and source file. Statistic measurements are retained as text in columns prefixed with `metric__`; this preserves values such as feet-and-inches measurements. Use `pandas.read_csv` to load a dataset, then convert individual measurement columns with `pandas.to_numeric(..., errors="coerce")` when numeric analysis is appropriate.
+
+```python
+import pandas as pd
+
+stats = pd.read_csv("PGA Tour Stats Analysis/pga_tour_stats_2024.csv.gz")
+```
+
+The script uses only the Python standard library and reads the ZIP archives without extracting or modifying them.
+
+---
+
 ## 📚 Stat Codes Reference
 
 All supported stats and their respective **IDs** are catalogued in:
